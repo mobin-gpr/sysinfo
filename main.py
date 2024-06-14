@@ -184,5 +184,5 @@ def display_system_info(args):
     if args.network:
         console.print("\n", get_network_info())
 
-if name == "main":
+if __name__ == "__main__":
     display_system_info(args)
