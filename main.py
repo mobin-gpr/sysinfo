@@ -3,52 +3,104 @@ import platform
 import tabulate
 import argparse
 
+from rich.console import Console
+from rich.table import Table
+console = Console()
+
 
 # Function to get OS information
-def get_os_info():
-    os_info = {}
-    os_info["System"] = platform.system()
-    os_info["OS Release"] = platform.release()
-    os_info["OS Version"] = platform.version()
-    return os_info
+def get_os_info():    
+    table = Table(title="Operating System Information")
+    table.add_column("System", justify="center", style="cyan", no_wrap=True)    
+    table.add_column("OS Release", justify="center", style="cyan")
+    table.add_column("OS Version", justify="center", style="magenta")
+    
+    table.add_row(
+        platform.system(),
+        str(platform.release()), 
+        str(platform.version()), 
+    )
+    
+    return table
 
 
 # Function to get CPU information
-def get_cpu_info():
-    cpu_info = {}
-    cpu_info["Processor"] = platform.processor()
-    cpu_info["Core count"] = psutil.cpu_count(logical=True)
-    cpu_info["Physical cores"] = psutil.cpu_count(logical=False)
-    cpu_info["CPU Usage (%)"] = psutil.cpu_percent(interval=1, percpu=False)
-    return cpu_info
+def get_cpu_info():        
+    table = Table(title="CPU Information")
+    table.add_column("Processor", justify="start", style="cyan", no_wrap=True)    
+    table.add_column("Core count", justify="start", style="cyan")
+    table.add_column("Physical cores", justify="start", style="magenta")
+    table.add_column("CPU Usage (%)", justify="start", style="green")
+    
+    table.add_row(
+        platform.processor(),
+        str(psutil.cpu_count(logical=True)), 
+        str(psutil.cpu_count(logical=False)), 
+        str(psutil.cpu_percent(interval=1, percpu=False))
+    )
+    
+    return table
 
 
 # Function to get RAM information
 def get_ram_info():
-    ram_info = {}
-    svmem = psutil.virtual_memory()
-    ram_info["Total memory (GB)"] = round(svmem.total / (1024**3), 2)
-    ram_info["Available memory (GB)"] = round(svmem.available / (1024**3), 2)
-    ram_info["Used memory (%)"] = svmem.percent
-    return ram_info
+    svmem = psutil.virtual_memory()    
+    
+    table = Table(title="CPU Information")
+    table.add_column("Total memory (GB)", justify="center", style="cyan", no_wrap=True)    
+    table.add_column("Available memory (GB)", justify="center", style="cyan")
+    table.add_column("Used memory (%)", justify="center", style="magenta")
+    
+    table.add_row(
+        str(round(svmem.total / (1024**3), 2)), 
+        str(round(svmem.available / (1024**3), 2)), 
+        str(svmem.percent)
+    )
+    
+    return table
 
 
 # Function to get Disk information
 def get_disk_info():
-    disk_info = {}
     partitions = psutil.disk_partitions()
+    
+    table = Table(title="Disk Information")
+    table.add_column("Device", justify="start", style="cyan", no_wrap=True)    
+    table.add_column("Total size (GB)", justify="start", style="cyan")
+    table.add_column("Used size (GB)", justify="start", style="magenta")
+    table.add_column("Free size (GB)", justify="start", style="green")
+    table.add_column("Usage (%)", justify="start")
+
     for partition in partitions:
         try:
             partition_usage = psutil.disk_usage(partition.mountpoint)
-            disk_info[partition.device] = {
-                "Total size (GB)": round(partition_usage.total / (1024**3), 2),
-                "Used size (GB)": round(partition_usage.used / (1024**3), 2),
-                "Free size (GB)": round(partition_usage.free / (1024**3), 2),
-                "Usage (%)": partition_usage.percent,
-            }
+            device = partition.device
+            total = round(partition_usage.total / (1024**3), 2)
+            used = round(partition_usage.used / (1024**3), 2)
+            free = round(partition_usage.free / (1024**3), 2)
+            usage_percent = partition_usage.percent
+            
+            if usage_percent <= 25:
+                usage_str = f"[bold green]{usage_percent}%[/bold green]"
+            elif usage_percent <= 50:
+                usage_str = f"[bold blue]{usage_percent}%[/bold blue]"
+            elif usage_percent <= 75:
+                usage_str = f"[bold #f5a629]{usage_percent}%[/]"
+            else:
+                usage_str = f"[bold red]{usage_percent}%[/bold red]"
+                
+            
+            table.add_row(
+                device,
+                str(total), 
+                str(used), 
+                str(free),
+                usage_str
+            )
         except PermissionError:
             continue
-    return disk_info
+        
+    return table
 
 
 # Function to get GPU information
@@ -78,10 +130,10 @@ def get_network_info():
 
 
 # Display system information in tabulated tables
-os_table = tabulate.tabulate(get_os_info().items(), tablefmt="grid")
-cpu_table = tabulate.tabulate(get_cpu_info().items(), tablefmt="grid")
-ram_table = tabulate.tabulate(get_ram_info().items(), tablefmt="grid")
-disk_table = tabulate.tabulate(get_disk_info().items(), headers="keys", tablefmt="grid")
+os_table = get_os_info()
+cpu_table = get_cpu_info()
+ram_table = get_ram_info()
+disk_table = get_disk_info()
 gpu_table = tabulate.tabulate(get_gpu_info(), headers="keys", tablefmt="grid")
 network_table = tabulate.tabulate(
     get_network_info().items(),
@@ -118,17 +170,17 @@ def display_system_info(args):
         print("\nNetwork Interface Information:")
         print(network_table)
     if args.os:
-        print("\nOperating System Information:")
-        print(os_table)
+        print("\n")
+        console.print(os_table)
     if args.cpu:
-        print("\nCPU Information:")
-        print(cpu_table)
+        print("\n")
+        console.print(cpu_table)
     if args.ram:
-        print("\nRAM Information:")
-        print(ram_table)
+        print("\n")
+        console.print(ram_table)
     if args.disk:
-        print("\nDisk Information:")
-        print(disk_table)
+        print("\n")
+        console.print(disk_table)
     if args.gpu:
         print("\nGPU Information:")
         print(gpu_table if gpu_table else "GPUs not available")
