@@ -1,4 +1,3 @@
-
 # Sysinfo
 
 This is a tool that gives you detailed information about the operating system and hardware components. This information includes the OS, CPU, RAM, Disks, GPU Network interface & ...
@@ -37,19 +36,30 @@ python main.py --help
 
 
 ```text
-usage: main.py [-h] [--all] [--os] [--cpu] [--ram] [--disk] [--gpu] [--network]
+usage: main.py [-h] [--all] [--os] [--cpu]
+               [--ram] [--disk] [--gpu]
+               [--network] [--process]
+               [--uptime] [--network_usage]
+               [--user] [--temperature]
 
 Display system information
 
-options:
-  -h, --help  show this help message and exit
-  --all       Display All information
-  --os        Display OS information
-  --cpu       Display CPU information
-  --ram       Display RAM information
-  --disk      Display Disk information
-  --gpu       Display GPU information
-  --network   Display Network interface information
+optional arguments:
+  -h, --help       show this help message and
+                   exit
+  --all            Display All information
+  --os             Display OS information
+  --cpu            Display CPU information
+  --ram            Display RAM information
+  --disk           Display Disk information
+  --gpu            Display GPU information
+  --network        Display Network interface
+                   information
+  --process        Display Process information
+  --uptime         Display System Uptime
+  --network_usage  Display Network Usage
+  --user           Display User Information
+  --temperature    Display System Temperature
 ```
 
 ## License
