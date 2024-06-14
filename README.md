@@ -1,7 +1,7 @@
 
 # Sysinfo
 
-This is a tool that gives you detailed information about the operating system and hardware components. This information includes the operating system, CPU, RAM, hard drives, graphics card, and network interface.
+This is a tool that gives you detailed information about the operating system and hardware components. This information includes the OS, CPU, RAM, Disks, GPU, and Network interface.
 
 ## Author
 
