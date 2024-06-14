@@ -2,6 +2,8 @@ import psutil
 import platform
 import argparse
 import GPUtil
+import os
+import time
 from rich.console import Console
 from rich.table import Table
 
@@ -146,6 +148,88 @@ def get_network_info():
     return table
 
 
+# Function to get Process information
+def get_process_info():
+    processes = []
+    for process in psutil.process_iter():
+        processes.append(
+            {
+                "PID": process.pid,
+                "Name": process.name(),
+                "CPU Usage (%)": process.cpu_percent(),
+                "Memory Usage (MB)": round(
+                    process.memory_info().rss / (1024 * 1024), 2
+                ),
+            }
+        )
+
+    table = Table(title="Process Information")
+    for key in processes[0].keys():
+        table.add_column(key, justify="start", style="cyan")
+
+    for process in processes:
+        table.add_row(*[str(value) for value in process.values()])
+
+    return table
+
+
+# Function to get System Uptime
+def get_system_uptime():
+    table = Table(title="System Uptime")
+    table.add_column("Uptime", justify="start", style="cyan")
+
+    uptime = round(time.time() - psutil.boot_time())
+    days, remainder = divmod(uptime, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    uptime_str = f"{days} days, {hours} hours, {minutes} minutes, {seconds} seconds"
+    table.add_row(uptime_str)
+
+    return table
+
+
+# Function to get Network Usage
+def get_network_usage():
+    net_io = psutil.net_io_counters()
+
+    table = Table(title="Network Usage")
+    table.add_column("Total Bytes Sent", justify="start", style="cyan")
+    table.add_column("Total Bytes Received", justify="start", style="magenta")
+
+    table.add_row(str(net_io.bytes_sent), str(net_io.bytes_recv))
+
+    return table
+
+
+# Function to get User Information
+def get_user_info():
+    table = Table(title="User Information")
+    table.add_column("Username", justify="start", style="cyan")
+    table.add_column("Home Directory", justify="start", style="magenta")
+
+    username = os.getlogin()
+    home_directory = os.path.expanduser("~")
+
+    table.add_row(username, home_directory)
+
+    return table
+
+
+# Function to get System Temperature
+def get_system_temperature():
+    sensors = psutil.sensors_temperatures()
+
+    table = Table(title="System Temperature")
+    for sensor, data in sensors.items():
+        table.add_column(sensor, justify="start", style="cyan")
+        sensor_data = " | ".join([f"{item.label}: {item.current}°C" for item in data])
+
+    table.add_row(sensor_data)
+
+    return table
+
+
 # Add command line argument parser
 parser = argparse.ArgumentParser(description="Display system information")
 parser.add_argument("--all", action="store_true", help="Display All information")
@@ -156,6 +240,17 @@ parser.add_argument("--disk", action="store_true", help="Display Disk informatio
 parser.add_argument("--gpu", action="store_true", help="Display GPU information")
 parser.add_argument(
     "--network", action="store_true", help="Display Network interface information"
+)
+parser.add_argument(
+    "--process", action="store_true", help="Display Process information"
+)
+parser.add_argument("--uptime", action="store_true", help="Display System Uptime")
+parser.add_argument(
+    "--network_usage", action="store_true", help="Display Network Usage"
+)
+parser.add_argument("--user", action="store_true", help="Display User Information")
+parser.add_argument(
+    "--temperature", action="store_true", help="Display System Temperature"
 )
 
 args = parser.parse_args()
@@ -170,6 +265,11 @@ def display_system_info(args):
         console.print("\n", get_disk_info())
         console.print("\n", get_gpu_info())
         console.print("\n", get_network_info())
+        console.print("\n", get_process_info())
+        console.print("\n", get_system_uptime())
+        console.print("\n", get_network_usage())
+        console.print("\n", get_user_info())
+        console.print("\n", get_system_temperature())
 
     if args.os:
         console.print("\n", get_os_info())
@@ -183,6 +283,16 @@ def display_system_info(args):
         console.print("\n", get_gpu_info())
     if args.network:
         console.print("\n", get_network_info())
+    if args.process:
+        console.print("\n", get_process_info())
+    if args.uptime:
+        console.print("\n", get_system_uptime())
+    if args.network_usage:
+        console.print("\n", get_network_usage())
+    if args.user:
+        console.print("\n", get_user_info())
+    if args.temperature:
+        console.print("\n", get_system_temperature())
 
 
 if __name__ == "__main__":
