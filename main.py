@@ -30,11 +30,21 @@ def get_cpu_info():
     table.add_column("Physical cores", justify="start", style="magenta")
     table.add_column("CPU Usage (%)", justify="start", style="green")
     
+    usage_percent = psutil.cpu_percent(interval=1, percpu=False)
+    if usage_percent <= 25:
+        usage_str = f"[bold green]{usage_percent}%[/bold green]"
+    elif usage_percent <= 50:
+        usage_str = f"[bold blue]{usage_percent}%[/bold blue]"
+    elif usage_percent <= 75:
+        usage_str = f"[bold yellow]{usage_percent}%[/bold yellow]"
+    else:
+        usage_str = f"[bold red]{usage_percent}%[/bold red]"
+        
     table.add_row(
         platform.processor(),
         str(psutil.cpu_count(logical=True)),
         str(psutil.cpu_count(logical=False)),
-        str(psutil.cpu_percent(interval=1, percpu=False))
+        str(usage_str)
     )
     
     return table
@@ -104,12 +114,22 @@ def get_gpu_info():
     table.add_column("GPU", justify="start", style="cyan", no_wrap=True)
     table.add_column("Memory Total (GB)", justify="start", style="cyan")
     table.add_column("Memory Used (GB)", justify="start", style="magenta")
-    
+        
     for gpu in gpu_info:
+        usage_percent = gpu.memoryUsed
+        if usage_percent <= 25:
+            usage_str = f"[bold green]{usage_percent}%[/bold green]"
+        elif usage_percent <= 50:
+            usage_str = f"[bold blue]{usage_percent}%[/bold blue]"
+        elif usage_percent <= 75:
+            usage_str = f"[bold yellow]{usage_percent}%[/bold yellow]"
+        else:
+            usage_str = f"[bold red]{usage_percent}%[/bold red]"
+            
         table.add_row(
             gpu.name,
             str(gpu.memoryTotal),
-            str(gpu.memoryUsed)
+            str(usage_str)
         )
     
     return table
@@ -144,25 +164,25 @@ args = parser.parse_args()
 # Function to display system information based on user input
 def display_system_info(args):
     if args.all:
-        console.print("\n[b]Operating System Information:[/b]\n", get_os_info())
-        console.print("\n[b]CPU Information:[/b]\n", get_cpu_info())
-        console.print("\n[b]RAM Information:[/b]\n", get_ram_info())
-        console.print("\n[b]Disk Information:[/b]\n", get_disk_info())
-        console.print("\n[b]GPU Information:[/b]\n", get_gpu_info())
-        console.print("\n[b]Network Information:[/b]\n", get_network_info())
+        console.print("\n", get_os_info())
+        console.print("\n", get_cpu_info())
+        console.print("\n", get_ram_info())
+        console.print("\n", get_disk_info())
+        console.print("\n", get_gpu_info())
+        console.print("\n", get_network_info())
         
     if args.os:
-        console.print("\n[b]Operating System Information:[/b]\n", get_os_info())
+        console.print("\n", get_os_info())
     if args.cpu:
-        console.print("\n[b]CPU Information:[/b]\n", get_cpu_info())
+        console.print("\n", get_cpu_info())
     if args.ram:
-        console.print("\n[b]RAM Information:[/b]\n", get_ram_info())
+        console.print("\n", get_ram_info())
     if args.disk:
-        console.print("\n[b]Disk Information:[/b]\n", get_disk_info())
+        console.print("\n", get_disk_info())
     if args.gpu:
-        console.print("\n[b]GPU Information:[/b]\n", get_gpu_info())
+        console.print("\n", get_gpu_info())
     if args.network:
-        console.print("\n[b]Network Information:[/b]\n", get_network_info())
+        console.print("\n", get_network_info())
 
-if __name__ == "__main__":
+if name == "main":
     display_system_info(args)
