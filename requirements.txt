@@ -1,2 +1,4 @@
 psutil==5.9.8
 rich==13.7.1
+GPUtil==1.4.0
+
