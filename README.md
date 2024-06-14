@@ -12,7 +12,7 @@ This is a tool that gives you detailed information about the operating system an
 Clone the project
 
 ```bash
-git clone https://github.com/mobin-gpr/fox-web-api.git
+git clone https://github.com/mobin-gpr/sysinfo.git
 ```
 
 Go to the project directory
