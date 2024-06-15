@@ -49,6 +49,7 @@ optional arguments:
                    exit
   --all            Display All information
   --os             Display OS information
+  --uptime         Display System Uptime
   --cpu            Display CPU information
   --ram            Display RAM information
   --disk           Display Disk information
@@ -56,7 +57,6 @@ optional arguments:
   --network        Display Network interface
                    information
   --process        Display Process information
-  --uptime         Display System Uptime
   --network_usage  Display Network Usage
   --user           Display User Information
   --temperature    Display System Temperature
