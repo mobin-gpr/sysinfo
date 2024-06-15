@@ -1,12 +1,15 @@
 import psutil
 import platform
 import argparse
-import GPUtil
 import os
 import time
 from rich.console import Console
 from rich.table import Table
-
+try:
+    import GPUtil
+except ImportError:
+    GPUtil = None
+    
 console = Console()
 
 
@@ -110,6 +113,9 @@ def get_disk_info():
 
 # Function to get GPU information
 def get_gpu_info():
+    if GPUtil is None:
+        return Table(title="GPU Information - GPUtil not available")
+
     gpu_info = GPUtil.getGPUs()
     table = Table(title="GPU Information")
     table.add_column("GPU", justify="start", style="cyan", no_wrap=True)
